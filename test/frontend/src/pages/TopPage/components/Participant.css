@@ -1,0 +1,28 @@
+select {
+    padding: 0.5em;
+}
+
+input[type="number"] {
+    width: 40px;
+    padding: 0.5em;
+}
+
+input[type="range"] {
+    width: 70%;
+    margin: auto 5px;
+}
+
+@media screen and (max-width:  1200px) {
+    select {
+        width: min-content;
+        height: 33px;
+    }
+
+    input[type="number"] {
+        display: none;
+    }
+
+    input[type="range"] {
+        width: 90%;
+    }
+}

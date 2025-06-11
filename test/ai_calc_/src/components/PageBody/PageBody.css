@@ -1,0 +1,32 @@
+.page-body {
+    display:flex;
+    justify-content: center;
+}
+  
+.area {
+    background: white;
+    border-radius: 8px;
+    margin: 10px;
+    padding: 20px;
+}
+
+@media screen and (max-width: 1200px) {
+    .page-body {
+      display: block;
+    }
+  
+    .area {
+      margin: 10px auto;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .page-body {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .content, .ad {
+        width: 90%;
+    }
+}

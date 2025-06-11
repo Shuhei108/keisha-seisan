@@ -1,0 +1,22 @@
+.loading-page-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* 上下中央寄せはしない */
+    width: 100%;
+}
+
+.loading-title {
+    color: #36d7b7;
+    margin-bottom: 24px;
+}
+
+.loading {
+    margin-bottom: 32px;
+}
+
+.loading-desc {
+    color: #888;
+    font-size: 1rem;
+    margin-bottom: 24px;
+}

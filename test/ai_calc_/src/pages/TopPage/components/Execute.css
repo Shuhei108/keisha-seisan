@@ -1,0 +1,13 @@
+.exe-btn {
+    display: block;
+    margin: 30px auto;
+    width: 250px;
+}
+
+.dummy-btn {
+    display: block;
+    margin: 30px auto;
+    width: 250px;
+    opacity:34%;
+    pointer-events: none;
+}
