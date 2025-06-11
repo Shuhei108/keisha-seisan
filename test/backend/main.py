@@ -15,6 +15,7 @@ class RequestFormat(BaseModel):
     amount: int
     participants: Dict[str, Dict[str, int]] = Field(..., min_length=1)
     rules: List[str] = None
+    model: str = None
 
 # FastAPIのインスタンスを作成
 app = FastAPI()
@@ -30,10 +31,6 @@ app.add_middleware(
 # APIキー設定
 key = "AIzaSyDbZAbuUtsrRzBsbQrTKpKk3209bXBbw2s"
 genai.configure(api_key=key)
-
-# モデル定義
-model = genai.GenerativeModel(model_name='gemini-2.5-flash-preview-05-20', tools='code_execution')
-modelForRes = genai.GenerativeModel(model_name='gemini-2.5-flash-preview-05-20')
 
 response_schema = {
     "type": "object",
@@ -91,7 +88,7 @@ async def calculate_settlement(data: RequestFormat):
     if not data.rules:
         return calc_simple_settlement(data.amount, data.participants)
     else:
-        return generate_response_with_rules(data.amount, data.participants, data.rules)
+        return generate_response_with_rules(data.amount, data.participants, data.rules, data.model)
 
 def calc_simple_settlement(amount: int, participants: Dict[str, Dict[str, int]]):
     """
@@ -104,11 +101,15 @@ def calc_simple_settlement(amount: int, participants: Dict[str, Dict[str, int]])
     ]
     return {"settlement_plan": settlement_plan, "total_amount": sum(item["amount"] for item in settlement_plan)}
 
-def generate_response_with_rules(amount: int, participants: Dict[str, Dict[str, int]], rules: List[str]):
+def generate_response_with_rules(amount: int, participants: Dict[str, Dict[str, int]], rules: List[str], model_name: str = None):
     """
     ルールを考慮した清算計算をGemini APIを用いて行う。
     """
     try:
+        model = genai.GenerativeModel(model_name=model_name, tools='code_execution')
+        modelForRes = genai.GenerativeModel(model_name=model_name)
+
+        
         messages = [
             {'role': 'user', 'parts': CONST.SYSTEM_PROMPT},
             {'role': 'model', 'parts': '承知しました。'}

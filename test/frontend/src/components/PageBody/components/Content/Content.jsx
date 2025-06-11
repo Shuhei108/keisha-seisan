@@ -6,6 +6,12 @@ import './Content.css'
 
 const inputInfoContext = createContext()
 
+const modelNameMap = {
+    "Gemini 1.5": "gemini-1.5-flash",
+    "Gemini 2.0": "gemini-2.0-flash",
+    "Gemini 2.5": "gemini-2.5-flash-preview-05-20",
+}
+
 const Content = () => {
     const [participants, setParticipants] = useState([
         {id: "first", name: "本部長", count: "1", weight: 50, payment: 0},
@@ -20,8 +26,8 @@ const Content = () => {
         {id: "totalAmount", flag: true}
     ])
     const [calcError, setCalcError] = useState(false)
-    const [model, setModel] = useState("gpt-4")
-    const models = ["gpt-4", "gpt-3.5", "test-4", "test-3.5"]
+    const [model, setModel] = useState("Gemini 2.0")
+    const models = ["Gemini 1.5", "Gemini 2.0", "Gemini 2.5"]
     const addForms = (inputId) => {
         const newForms = [...forms,{id: inputId, flag: false}]
         setForms(newForms)
@@ -47,7 +53,8 @@ const Content = () => {
         const reqData = {
             participants:{},
             rules: null,
-            amount: null
+            amount: null,
+            model: null
         }
 
         for (let i = 0; i < participants.length; i++) { 
@@ -57,6 +64,8 @@ const Content = () => {
         reqData["rules"] = rules.map((rule) => {return rule.value})
 
         reqData["amount"] = parseInt(amount,10)
+
+        reqData["model"] = modelNameMap[model]
 
         console.log(reqData)
         
