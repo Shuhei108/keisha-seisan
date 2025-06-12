@@ -8,7 +8,7 @@ function App() {
 
   return (
     <>
-      <PageHeader title={"AI 傾斜清算"}/>
+      <PageHeader title={"AI 傾斜精算"}/>
       <PageBody />
     </>
   )

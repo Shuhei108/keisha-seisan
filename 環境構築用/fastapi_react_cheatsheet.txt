@@ -1,0 +1,74 @@
+🚀 FastAPI + React デプロイ & 反映 チートシート
+=============================================
+
+📁 プロジェクト構成（例）
+--------------------------
+myapp/
+├── backend/
+│   ├── main.py
+│   ├── requirements.txt
+│   └── Dockerfile
+├── frontend/
+│   ├── dist/              ← Reactビルド後アップロードされる
+│   ├── nginx.conf
+│   └── Dockerfile
+├── docker-compose.yml
+└── .env（必要に応じて）
+
+
+🛠 初回デプロイ手順
+--------------------
+1. サーバーにアプリ一式アップロード
+2. Dockerインストール済みであることを確認
+3. 以下コマンドを実行：
+
+```bash
+cd ~/myapp
+docker-compose up --build -d
+```
+
+📦 修正後の反映手順（内容別）
+------------------------------
+
+🔧 FastAPI（Pythonコード）を変更した場合:
+```bash
+docker-compose up --build -d
+```
+
+📦 Python依存（requirements.txt）を変更した場合:
+```bash
+docker-compose build backend
+docker-compose up -d
+```
+
+💻 React UI を変更した場合:
+1. ローカルで `npm run build`
+2. `dist/` の中身を `frontend/dist/` にアップロード
+3. 以下を実行：
+```bash
+docker-compose up --build -d
+```
+
+🌐 nginx.conf を変更した場合:
+```bash
+docker-compose build frontend
+docker-compose up -d
+```
+
+🧪 開発時のホットリロード（FastAPI）:
+backend/Dockerfile の CMD を以下に変更
+```dockerfile
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+```
+
+🧹 コンテナのクリーンアップ（必要に応じて）:
+```bash
+docker-compose down
+docker system prune -af
+```
+
+📄 補足
+------------------------------
+- `--build`：Docker イメージを再構築（変更内容反映に必要）
+- `-d`：デタッチド（バックグラウンド）起動
+- `--reload`：開発モードでのリアルタイム再起動（FastAPI）

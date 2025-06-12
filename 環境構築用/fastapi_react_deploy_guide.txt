@@ -1,0 +1,142 @@
+
+# FastAPI + React 単一サーバー構成デプロイ手順（CentOS Stream 9）
+
+## 前提条件
+- サーバーOS: CentOS Stream 9
+- サーバーにrootまたはsudo権限あり
+- ローカルでReactアプリはビルド済み（`dist/` フォルダ）
+- アプリ構成: FastAPIバックエンド + Reactフロントエンド（静的）をDockerで共存
+
+---
+
+## 1. 必要パッケージとDockerのインストール
+
+```bash
+sudo dnf install -y yum-utils device-mapper-persistent-data lvm2
+sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+sudo dnf install -y docker-ce docker-ce-cli containerd.io
+sudo systemctl enable --now docker
+sudo usermod -aG docker $USER  # 再ログイン後有効
+```
+
+---
+
+## 2. ディレクトリ構成（サーバー上）
+
+```
+/home/youruser/myapp/
+├── backend/
+│   ├── app/
+│   │   └── main.py
+│   ├── requirements.txt
+│   └── Dockerfile
+├── frontend/         ← dist/ の中身のみここへアップロード
+│   ├── index.html
+│   └── assets/ など
+├── nginx/
+│   ├── default.conf
+│   └── Dockerfile
+└── docker-compose.yml
+```
+
+---
+
+## 3. backend/Dockerfile
+
+```dockerfile
+FROM python:3.11-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY ./app /app
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+```
+
+---
+
+## 4. requirements.txt
+
+```
+fastapi
+uvicorn[standard]
+```
+必要に応じて他の依存も追加（例：pydantic, aiofilesなど）
+
+---
+
+## 5. nginx/Dockerfile
+
+```dockerfile
+FROM nginx:alpine
+COPY default.conf /etc/nginx/conf.d/default.conf
+COPY ../frontend /usr/share/nginx/html
+```
+
+---
+
+## 6. nginx/default.conf
+
+```nginx
+server {
+    listen 80;
+
+    location / {
+        root /usr/share/nginx/html;
+        index index.html index.htm;
+        try_files $uri /index.html;
+    }
+
+    location /api/ {
+        proxy_pass http://backend:8000/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+}
+```
+
+---
+
+## 7. docker-compose.yml
+
+```yaml
+version: '3'
+services:
+  backend:
+    build: ./backend
+    container_name: fastapi-backend
+    expose:
+      - "8000"
+
+  frontend:
+    build: ./nginx
+    container_name: nginx-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+```
+
+---
+
+## 8. 起動手順
+
+```bash
+cd /home/youruser/myapp/
+docker-compose up --build -d
+```
+
+---
+
+## 9. アクセス確認
+
+ブラウザで http://<サーバーのIP>/ にアクセス
+
+- React フロントエンドが表示される
+- API ルートは http://<サーバーのIP>/api/
+
+---
+
+## 補足
+
+- Docker未使用で構成したい場合、NginxやGunicornでFastAPIを反転プロキシする構成も可
+- ファイルアップロードや静的ファイル提供がある場合はFastAPI側に設定追加が必要

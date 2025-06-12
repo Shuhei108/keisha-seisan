@@ -1,0 +1,129 @@
+GCEでVMインスタンスを作成
+SSH認証鍵の作成
+http://gcpqiita.com/Brutus/items/22dfd31a681b67837a74
+
+フォルダ構成
+myapp/
+├── backend/
+│   ├── app/
+│   │   ├── api/
+│   │   ├── core/
+│   │   ├── models/
+│   │   ├── services/
+│   │   ├── main.py
+│   │   └── ...
+│   ├── Dockerfile
+│   └── requirements.txt
+├── frontend/
+│   ├── public/
+│   ├── src/
+│   ├── package.json
+│   ├── vite.config.ts（または webpack.config.js）
+│   └── ...
+├── nginx/
+│   ├── nginx.conf
+│   └── ...
+├── .env
+├── docker-compose.yml
+└── README.md
+
+1. Dockerのインストール
+sudo dnf -y install dnf-plugins-core
+sudo dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+sudo dnf install -y docker-ce docker-ce-cli containerd.io
+sudo systemctl enable --now docker
+
+2. Docker Composeのインストール
+Docker Compose v2（plugin）をインストール：
+mkdir -p ~/.docker/cli-plugins/
+curl -SL https://github.com/docker/compose/releases/download/v2.27.1/docker-compose-linux-x86_64 -o ~/.docker/cli-plugins/docker-compose
+chmod +x ~/.docker/cli-plugins/docker-compose
+docker compose version  # ← 正常に表示されればOK
+
+3. CentOS上のディレクトリ構成を準備
+例：
+mkdir -p /var/www/myapp
+cd /var/www/myapp
+
+4. フロントエンド：React ビルド
+ローカルで以下を実行（既に済みであればOK）：
+cd frontend
+npm install
+npm run build
+
+5. バックエンド：FastAPI アプリ準備
+backend/main.py などの構成ができている前提で、requirements.txt に必要なライブラリが記述されていることを確認。
+例：
+fastapi
+uvicorn[standard]
+gunicorn
+python-dotenv
+
+6. Dockerfile を作成（FastAPI）
+backend/Dockerfile：
+FROM python:3.11-slim
+
+WORKDIR /app
+
+COPY ./app /app
+COPY requirements.txt .
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+CMD ["gunicorn", "-k", "uvicorn.workers.UvicornWorker", "main:app", "--bind", "0.0.0.0:8000"]
+
+7. Nginx 設定ファイル作成
+nginx/nginx.conf：
+
+nginx
+コードをコピーする
+server {
+    listen 80;
+
+    location / {
+        root /usr/share/nginx/html;
+        index index.html;
+        try_files $uri /index.html;
+    }
+
+    location /api {
+        proxy_pass http://backend:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+}
+
+8. docker-compose.yml 作成
+プロジェクトルートに以下を作成：
+version: '3'
+
+services:
+  backend:
+    build:
+      context: ./backend
+    container_name: fastapi-backend
+    expose:
+      - "8000"
+
+  frontend:
+    image: nginx:latest
+    container_name: react-frontend
+    ports:
+      - "80:80"
+    volumes:
+      - ./frontend/build:/usr/share/nginx/html
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - backend
+
+9. .env ファイル（任意）
+FastAPI 側で .env を使っているなら、docker-compose.yml に以下を追加：
+env_file:
+  - .env
+
+10. Dockerビルドと起動
+docker-compose build
+docker-compose up -d
+成功すれば、以下でアクセスできます：
+http://your-server-ip/ → React アプリ
+http://your-server-ip/api/ → FastAPI 経由のAPI
