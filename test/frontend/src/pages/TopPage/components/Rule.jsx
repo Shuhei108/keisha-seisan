@@ -38,8 +38,8 @@ const Rule = ({ rule, deleteRule, changeRule, updateForms }) => {
         let firstName = "○○"
         let lastName = "○○"
         if (participants && participants.length > 0) {
-            if (participants[0].name) firstName = participants[0].name
-            if (participants[participants.length - 1].name) lastName = participants[participants.length - 1].name
+            if (participants[0].name?.trim()) firstName = participants[0].name
+            if (participants[participants.length - 1].name?.trim()) lastName = participants[participants.length - 1].name
         }
         setSuggestions([
             "最小単位は500円とする",
@@ -101,18 +101,21 @@ const Rule = ({ rule, deleteRule, changeRule, updateForms }) => {
                             onKeyDown={handleKeyDown}
                         />
                         {showSuggestions && filteredSuggestions.length > 0 && (
-                            <ul className="suggestion-list">
-                                {filteredSuggestions.map((s, idx) => (
-                                    <li
-                                        key={idx}
-                                        className={`suggestion-item${highlightIdx === idx ? ' highlighted' : ''}`}
-                                        onMouseDown={() => handleSuggestionClick(s)}
-                                        onMouseEnter={() => setHighlightIdx(idx)}
-                                    >
-                                        {s}
-                                    </li>
-                                ))}
-                            </ul>
+                            <div className="suggestion-list-container">
+                                <div className="suggestion-list-header">入力候補</div>
+                                <ul className="suggestion-list">
+                                    {filteredSuggestions.map((s, idx) => (
+                                        <li
+                                            key={idx}
+                                            className={`suggestion-item${highlightIdx === idx ? ' highlighted' : ''}`}
+                                            onMouseDown={() => handleSuggestionClick(s)}
+                                            onMouseEnter={() => setHighlightIdx(idx)}
+                                        >
+                                            {s}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
                         )}
                     </div>
                 </td>

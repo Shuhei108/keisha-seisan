@@ -20,33 +20,54 @@
     border-image: initial;
 }
 
-.suggestion-list {
+.suggestion-list-container {
     position: absolute;
     left: 0;
     top: 110%;
+    width: 90%;
     background: #fff;
     border-radius: 10px;
     box-shadow: 0 4px 16px rgba(60, 60, 60, 0.12), 0 1.5px 4px rgba(60,60,60,0.08);
     border: 1px solid #e0e0e0;
-    width: 90%;
     z-index: 20;
     margin: 0;
-    padding: 6px 0;
-    list-style: none;
+    padding: 0;
     transition: box-shadow 0.2s;
 }
 
+.suggestion-list-header {
+    font-size: 0.95em;
+    color: #36d7b7;
+    background: #f5f7fa;
+    border-bottom: 1px solid #e0e0e0;
+    border-radius: 10px 10px 0 0;
+    padding: 8px 16px 6px 16px;
+    font-weight: bold;
+    letter-spacing: 0.03em;
+    text-align: center;
+}
+
+.suggestion-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
 .suggestion-item {
-    padding: 10px 18px;
+    padding: 12px 18px;
     font-size: 1em;
     color: #333;
     cursor: pointer;
-    border-radius: 6px;
-    margin: 2px 6px;
+    border-bottom: 1px solid #e0e0e0;
+    background: #fff;
     transition: background 0.15s, color 0.15s;
     display: flex;
     align-items: center;
     gap: 8px;
+}
+
+.suggestion-item:last-child {
+    border-bottom: none;
 }
 
 .suggestion-item:hover,
@@ -68,7 +89,7 @@
         border-style: solid;
         border-color: light-dark(rgb(118, 118, 118), rgb(133, 133, 133));
     }
-    .suggestion-list {
+    .suggestion-list-container {
         width: 85%;
     }
 }
