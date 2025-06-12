@@ -1,0 +1,21 @@
+.rule-textarea {
+    width: 90%;                /* テキストエリアの横幅（親要素の90%） */
+    height: 39px;              /* テキストエリアの初期高さ */
+    padding: 0.5em;            /* 内側の余白 */
+    font-size: 1em;            /* 文字サイズ */
+    border-radius: 5px;        /* 角の丸み */
+    resize: none;              /* ユーザーによるリサイズ禁止 */
+    overflow: hidden;          /* スクロールバー非表示 */
+    box-sizing: border-box;    /* paddingとborderをwidth/heightに含める */
+    line-height: 1.5;          /* 行の高さ */
+    vertical-align: middle;    /* 垂直方向の配置 */
+    white-space: pre-wrap;     /* テキストの折り返し（改行文字も反映） */
+    word-break: break-all;     /* 単語の途中でも折り返し */
+    overflow-wrap: break-word; /* 単語の途中でも折り返し */
+}
+
+@media screen and (max-width: 1200px) {
+    .rule-textarea {
+        width: 85%;
+    }
+}
