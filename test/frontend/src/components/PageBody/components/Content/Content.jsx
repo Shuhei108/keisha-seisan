@@ -49,7 +49,7 @@ const Content = () => {
         setStatus("loading")
         setCalcError(false)
         
-        const url = 'http://192.168.11.2:8000/v1/calc'
+        const url = '/api/v1/calc'
         const reqData = {
             participants:{},
             rules: null,
