@@ -6,6 +6,11 @@ from fastapi.middleware.cors import CORSMiddleware
 import constForPrompt
 import json
 import math  
+import os
+from dotenv import load_dotenv
+
+# 環境変数をロード
+load_dotenv()
 
 # 定数クラス
 CONST = constForPrompt.ConstForPrompt
@@ -22,15 +27,14 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173","http://192.168.11.2:5173"],  # 許可するオリジン
+    allow_origins=os.getenv("ALLOW_ORIGINS", "").split(","),  # 環境変数から取得
     allow_credentials=True,
-    allow_methods=["*"],  # 許可するHTTPメソッド
-    allow_headers=["*"],  # 許可するHTTPヘッダー
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # APIキー設定
-key = "AIzaSyDbZAbuUtsrRzBsbQrTKpKk3209bXBbw2s"
-genai.configure(api_key=key)
+genai.configure(api_key=os.getenv("API_KEY"))  # 環境変数から取得
 
 response_schema = {
     "type": "object",
