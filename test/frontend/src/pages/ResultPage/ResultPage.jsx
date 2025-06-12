@@ -3,12 +3,15 @@ import EarchPayment from './components/EachPayment'
 import './ResultPage.css'
 
 const Result = () => {
-    const { participants, setStatus, calculate, calcError, setCalcError } = useInputInfo()
+    const { participants, setStatus, calculate, calcError, setCalcError, surplus } = useInputInfo()
     var totalAmount = 0;
     
     participants.map((participant) => {
         totalAmount += parseInt(participant.payment,10) * participant.count
     })
+    if (surplus != 0) {
+        totalAmount += surplus
+    }
 
     return (
         <div className='result'>
@@ -19,7 +22,10 @@ const Result = () => {
                         <td colSpan="2"><h2>計算結果</h2></td>
                     </tr>
                 </thead>
-                <EarchPayment participants={participants} />
+                <tbody>
+                    <EarchPayment participants={participants} />
+                    {surplus !== 0 && <tr><td>余り</td><td>{surplus}円</td></tr>}
+                </tbody>
                 <tfoot>
                     <tr>
                         <td>合計金額</td>

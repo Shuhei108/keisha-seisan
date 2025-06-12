@@ -45,11 +45,16 @@ response_schema = {
                 "type": "object",
                 "properties": {
                     "participant": {"type": "string"},
-                    "amount": {"type": "integer"}
+                    "amount": {"type": "integer"},
+                    "count": {"type": "integer"}
                 },
-                "required": ["participant", "amount"]
+                "required": ["participant", "amount", "count"]
             }
         },
+        "surplus": {  
+            "type": "integer",
+            "description": "割り切れなかった場合の余剰金。割り切れる場合は含まれない。"
+        }
     },
     "required": ["settlement_plan"]
 }
@@ -144,6 +149,9 @@ def generate_response_with_rules(amount: int, participants: Dict[str, Dict[str, 
         obj["total_amount"] = sum(
             p["amount"] * participants[p["participant"]][CONST.COUNT] for p in obj["settlement_plan"]
         )
+        if "surplus" in obj:
+            obj["total_amount"] += obj["surplus"]
+
         return obj
     except Exception as e:
         print(f"APIエラー: {e}") 

@@ -14,20 +14,26 @@ const modelNameMap = {
 
 const Content = () => {
     const [participants, setParticipants] = useState([
-        {id: "first", name: "本部長", count: "1", weight: 50, payment: 0},
-        {id: "second", name: "課長", count: "1", weight: 50, payment: 0} 
+        {id: "first", name: "本部長", count: "1", weight: 70, payment: 0},
+        {id: "second", name: "課長", count: "1", weight: 60, payment: 0},
+        {id: "third", name: "", count: "1", weight: 50, payment: 0},
+        {id: "fourth", name: "", count: "1", weight: 40, payment: 0} 
     ])
-    const [rules, setRules] = useState([])
-    const [amount, setAmount] = useState(100000)
+    const [rules, setRules] = useState([
+        {id: "first", value: "最小単位は500円とする"},
+        {id: "second", value: "計算結果の合計金額と会計金額の差が500円未満になるまで計算する"}
+    ])
+    const [amount, setAmount] = useState()
     const [status, setStatus] = useState("top")
     const [forms, setForms] = useState([
         {id: "first", flag: true},
         {id: "second", flag: true},
-        {id: "totalAmount", flag: true}
+        {id: "totalAmount", flag: false}
     ])
     const [calcError, setCalcError] = useState(false)
     const [model, setModel] = useState("Gemini 2.0")
     const models = ["Gemini 1.5", "Gemini 2.0", "Gemini 2.5"]
+    const [surplus, setSurplus] = useState(0)
     const addForms = (inputId) => {
         const newForms = [...forms,{id: inputId, flag: false}]
         setForms(newForms)
@@ -48,7 +54,7 @@ const Content = () => {
     const calculate = async () => {
         setStatus("loading")
         setCalcError(false)
-        
+
         const url = '/api/v1/calc'
         const reqData = {
             participants:{},
@@ -86,6 +92,12 @@ const Content = () => {
                 return participant
             })
             setParticipants(newParticipants)
+
+            const newSurplus = resData["surplus"]
+            setSurplus(0)
+            if (newSurplus) {
+                setSurplus(newSurplus)
+            }
         } catch (error) {
             setCalcError(true)
         }
@@ -104,7 +116,8 @@ const Content = () => {
     
     return (
         <inputInfoContext.Provider value={{ status, setStatus, participants, setParticipants, rules,
-            setRules, amount, setAmount, forms, setForms, addForms, deleteForms, updateForms, calculate, calcError, setCalcError, model, setModel, models }}>
+            setRules, amount, setAmount, forms, setForms, addForms, deleteForms, updateForms, calculate,
+            calcError, setCalcError, model, setModel, models, surplus }}>
             <div className='content area'>
                 { viewControl() }
             </div>
