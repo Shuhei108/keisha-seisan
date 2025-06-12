@@ -4,6 +4,12 @@ import Participant from './Participant'
 import HelpModal from '@/components/Modal/ParticipantHelp' // モーダルをインポート
 import { FaQuestionCircle } from "react-icons/fa";
 
+const weightDiff = 10; // 重みづけの差分
+const firstWeight = 70; // 最初の参加者の重みづけ
+const defaultWeight = 50; // デフォルトの重みづけ
+const defaultCount = 1; // デフォルトの人数
+const defaultPayment = 0; // デフォルトの支払い金額
+
 const Participants = () => {
     const { participants, setParticipants, addForms, deleteForms, updateForms } = useInputInfo()
 
@@ -15,10 +21,14 @@ const Participants = () => {
     const addParticipant = () => {
         const inputId = generateId()
         if (participants.length > 0) {
-            const newParticipants = [...participants, {id: inputId, name: "", count: 1, weight: participants[participants.length-1].weight, payment: 0}];
+            let inputWeight = participants[participants.length-1].weight // ← letに修正
+            if (inputWeight > weightDiff) {
+                inputWeight = inputWeight - weightDiff; // 前の参加者の重みから差分を引く
+            }
+            const newParticipants = [...participants, {id: inputId, name: "", count: defaultCount, weight: inputWeight, payment: defaultPayment}];
             setParticipants(newParticipants);
         } else {
-            setParticipants([{id: inputId, name: "", count: 1, weight: 50, payment: 0}])
+            setParticipants([{id: inputId, name: "", count: defaultCount, weight: firstWeight, payment: defaultPayment}])
         }
         addForms(inputId)
         setCheckInput(true)
@@ -82,7 +92,7 @@ const Participants = () => {
         const newParticipants = participants.map((participant)=> {
             if (participant.id === id) {
                 if (val === "") {
-                    participant.weight = 50
+                    participant.weight = defaultWeight
                 } 
             }
             return participant

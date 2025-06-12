@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import './Rule.css'
 
 const Rule = ({ rule, deleteRule, changeRule, updateForms }) => {
@@ -26,6 +26,15 @@ const Rule = ({ rule, deleteRule, changeRule, updateForms }) => {
             textarea.style.height = textarea.scrollHeight + "px"
         }
     }
+
+    // 画面描画時にも高さ自動調整
+    useEffect(() => {
+        const textarea = textareaRef.current
+        if (textarea) {
+            textarea.style.height = "auto"
+            textarea.style.height = textarea.scrollHeight + "px"
+        }
+    }, [rule.value])
 
     return (
         <>

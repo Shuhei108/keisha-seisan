@@ -1,6 +1,6 @@
 const EarchPayment = ({ participants }) => {
     return (
-        <tbody>
+        <>
             {participants.map((participant) => {
                 return (
                     <tr key={participant.id}>
@@ -9,7 +9,7 @@ const EarchPayment = ({ participants }) => {
                     </tr>
                 )
             })}
-        </tbody>
+        </>
     )
 }
 
