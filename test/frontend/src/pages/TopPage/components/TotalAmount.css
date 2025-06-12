@@ -1,11 +1,10 @@
-/* .total-amount {
-    text-align: right;
-    width: calc(90% + 2em);
-} */
-
 .total-amount input[type="text"] {
-    /* width: 20%; */
-    /* margin-right: 0.2em; */
-    /* margin-left: 1em; */
+    width: 90%;
     text-align: right;
+}
+
+@media screen and (max-width: 1200px) {
+    .total-amount input[type="text"] {
+        width: 85%;
+    }
 }
