@@ -102,7 +102,6 @@ const Rule = ({ rule, deleteRule, changeRule, updateForms }) => {
                         />
                         {showSuggestions && filteredSuggestions.length > 0 && (
                             <div className="suggestion-list-container">
-                                <div className="suggestion-list-header">入力候補</div>
                                 <ul className="suggestion-list">
                                     {filteredSuggestions.map((s, idx) => (
                                         <li

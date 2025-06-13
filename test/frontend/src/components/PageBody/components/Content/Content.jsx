@@ -17,13 +17,12 @@ const Content = () => {
         {id: "first", name: "部長", count: "1", weight: 70, payment: 0},
         {id: "second", name: "次長", count: "1", weight: 60, payment: 0},
         {id: "third", name: "課長", count: "1", weight: 50, payment: 0},
-        {id: "fourth", name: "主任", count: "1", weight: 40, payment: 0} 
     ])
     const [rules, setRules] = useState([
         {id: "first", value: "最小単位は500円とする"},
         {id: "second", value: "会計金額と計算結果の合計金額の差が500円未満になるまで計算する"}
     ])
-    const [amount, setAmount] = useState()
+    const [amount, setAmount] = useState("")
     const [status, setStatus] = useState("top")
     const [forms, setForms] = useState([
         {id: "first", flag: true},
@@ -73,8 +72,6 @@ const Content = () => {
 
         reqData["model"] = modelNameMap[model]
 
-        console.log(reqData)
-        
         try {
             const response = await fetch(url,{
                 method: 'POST',
@@ -86,7 +83,6 @@ const Content = () => {
             });
 
             const resData = await response.json();
-            console.log(resData)
             const newParticipants = participants.map((participant, i) => {
                 participant.payment = resData["settlement_plan"][i]["amount"]
                 return participant
