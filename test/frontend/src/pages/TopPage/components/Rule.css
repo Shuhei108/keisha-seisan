@@ -70,7 +70,7 @@
     position: relative;
 }
 
-@media screen and (max-width: 1000px) {
+@media screen and (max-width: 950px) {
     .rule-textarea {
         width: 85%;
         border-width: 1px;

@@ -21,7 +21,7 @@ button:hover {
   color: red;
 }
 
-@media screen and (max-width:  1000px) {
+@media screen and (max-width:  950px) {
   button {
     margin: 5px;
   }

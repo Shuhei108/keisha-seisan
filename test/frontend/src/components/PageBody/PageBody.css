@@ -10,7 +10,7 @@
     padding: 20px;
 }
 
-@media screen and (max-width:  1000px) {
+@media screen and (max-width:  950px) {
     .page-body {
       display: block;
     }

@@ -18,20 +18,41 @@ input[type="number"] {
 
 input[type="range"] {
     width: 70%;
-    margin: auto 5px;
+    margin: 0px 5px 0px 0px;
+    vertical-align: middle;
 }
 
-@media screen and (max-width:  1000px) {
+.sp {
+    display: none;
+    text-align: center;
+    width: 90%;
+    margin: 0px 5px 0px 0px;
+}
+.weight {
+    container-type: inline-size;
+    display: block;
+    align-items: center;
+}
+
+@media screen and (max-width:  950px) {
     select {
         width: min-content;
         height: 33px;
     }
+}
 
+/* col-4が230px以下のときのデザイン */
+@container (max-width: 230px) {
     input[type="number"] {
         display: none;
     }
-
     input[type="range"] {
+        width: 90%;
+    }
+    .sp {
+        display: block;
+    }
+    .weight {
         width: 90%;
     }
 }

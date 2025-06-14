@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { useInputInfo } from '@/components/PageBody/components/Content/Content'
 import Rule from './Rule'
-import HelpModal from '@/components/Modal/RuleHelp' // モーダルをインポート
+import HelpModal from '@/components/Modal/RuleHelp'
 import { FaQuestionCircle } from "react-icons/fa";
-
+import './Rules.css'
 
 const Rules = () => {
     const { rules, setRules, addForms, deleteForms, updateForms } = useInputInfo()
@@ -45,36 +45,35 @@ const Rules = () => {
                 <thead>
                     <tr>
                         <td></td>
-                        <td colSpan="3" style={{ display: 'flex', alignItems: 'center' }}>
-                            <h2  style={{ marginRight: '8px' }}>精算ルール</h2>
-                            <FaQuestionCircle 
-                                size={16} 
-                                style={{ cursor: 'pointer' }} 
-                                onClick={() => setIsHelpOpen(true)} 
-                                title="参加者入力のヘルプ" 
-                            />
+                        <td colSpan="3">
+                            <div className="rules-header">
+                                <h2>精算ルール</h2>
+                                <FaQuestionCircle
+                                    size={16}
+                                    className="rules-help-icon"
+                                    onClick={() => setIsHelpOpen(true)}
+                                    title="参加者入力のヘルプ"
+                                />
+                            </div>
                         </td>
                     </tr>
                 </thead>
                 <tbody>
-                    {rules.map((rule) => {
-                        return (
-                            <Rule
-                                key={rule.id}
-                                rule={rule}
-                                deleteRule={() => {deleteRule(rule.id)}}
-                                changeRule={(val) => {changeRule(rule.id,val)}}
-                                updateForms={(val) => {updateForms(rule.id,val)}} /> 
-                        )
-                    })}
+                    {rules.map((rule) => (
+                        <Rule
+                            key={rule.id}
+                            rule={rule}
+                            deleteRule={() => {deleteRule(rule.id)}}
+                            changeRule={(val) => {changeRule(rule.id,val)}}
+                            updateForms={(val) => {updateForms(rule.id,val)}}
+                        />
+                    ))}
                     <tr>
                         <td className='col-1'><button onClick={addRule}>+</button></td>
                         <td colSpan="3"></td>
                     </tr>
                 </tbody>
             </table>
-
-            {/* ヘルプモーダルの表示 */}
             <HelpModal isOpen={isHelpOpen} onClose={() => setIsHelpOpen(false)} />
         </>
     )

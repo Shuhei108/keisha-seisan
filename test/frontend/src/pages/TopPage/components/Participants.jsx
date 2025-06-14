@@ -1,3 +1,4 @@
+import './Participants.css'
 import { useState } from 'react'
 import { useInputInfo } from '@/components/PageBody/components/Content/Content'
 import Participant from './Participant'
@@ -105,16 +106,18 @@ const Participants = () => {
             <table>
                 <thead>
                     <tr>
-                        <td></td>
-                        <td colSpan="3" style={{ display: 'flex', alignItems: 'center' }}>
-                            <h2 style={{ marginRight: '8px' }}>参加者</h2>
-                            <FaQuestionCircle 
-                                size={16} 
-                                style={{ cursor: 'pointer' }} 
-                                onClick={() => setIsHelpOpen(true)} 
-                                title="参加者入力のヘルプ" 
-                            />
-                        </td>
+                        <th></th>
+                        <th colSpan="3">
+                            <div className="participants-header">
+                                <h2>参加者</h2>
+                                <FaQuestionCircle 
+                                    size={16}
+                                    className="participants-help-icon"
+                                    onClick={() => setIsHelpOpen(true)}
+                                    title="参加者入力のヘルプ"
+                                />
+                            </div>
+                        </th>
                     </tr>
                     <tr>
                         <th className='col-1'></th>

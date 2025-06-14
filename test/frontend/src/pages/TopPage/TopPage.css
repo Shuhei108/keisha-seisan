@@ -26,11 +26,8 @@
     width: 50%;
     text-align: start;
 }
-.sp {
-    display: none;
-}
 
-@media screen and (max-width:  1000px) {
+@media screen and (max-width:  950px) {
     h2 {
         margin-top: 8px;
         margin-bottom: 8px;
@@ -50,10 +47,6 @@
     }
     .top-page .col-4 {
         width: auto;
-    }
-    .sp {
-        display: block;
-        text-align: center;
     }
     input[type="range"]::-webkit-slider-thumb {
         width: 20px;
