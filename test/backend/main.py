@@ -8,6 +8,7 @@ import json
 import math  
 import os
 from dotenv import load_dotenv
+from datetime import datetime, timezone
 
 # 環境変数をロード
 load_dotenv()
@@ -59,12 +60,30 @@ response_schema = {
     "required": ["settlement_plan"]
 }
 
+def write_log(log_type: str, body: dict):
+    """
+    リクエスト・レスポンス情報をlogファイルに追記する
+    """
+    log_dir = "logs"
+    log_path = os.path.join(log_dir, "request_response.log")
+    os.makedirs(log_dir, exist_ok=True)
+    log_entry = {
+        "timestamp": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "type": log_type,
+        "body": body
+    }
+    with open(log_path, "a", encoding="utf-8") as f:
+        f.write(json.dumps(log_entry, ensure_ascii=False) + "\n")
+
 @app.post("/v1/calc")
 async def calculate_settlement(data: RequestFormat):
     """
     清算金額を計算するエンドポイント
     """
-     # amountのチェック
+    # リクエストログ出力
+    write_log("request", data.dict())
+
+    # amountのチェック
     if data.amount <= 0:
         raise HTTPException(status_code=400, detail="amountは正の整数である必要があります。")
 
@@ -95,9 +114,14 @@ async def calculate_settlement(data: RequestFormat):
 
     # 正常処理
     if not data.rules:
-        return calc_simple_settlement(data.amount, data.participants)
+        result = calc_simple_settlement(data.amount, data.participants)
     else:
-        return generate_response_with_rules(data.amount, data.participants, data.rules, data.model)
+        result = generate_response_with_rules(data.amount, data.participants, data.rules, data.model)
+
+    # レスポンスログ出力
+    write_log("response", result)
+
+    return result
 
 def calc_simple_settlement(amount: int, participants: Dict[str, Dict[str, int]]):
     """
