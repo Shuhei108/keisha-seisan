@@ -1,22 +1,17 @@
-select {
+.participant select {
     padding: 0.5em;
 }
 
-input[type="text"] {
-    width: 95%;
-    height: 38px;
-    padding: 0.5em;
-    font-size: 1em;
-    border-radius: 5px;
-    box-sizing: border-box;
+.participant input[type="text"] {
+    width: 100%;
 }
 
-input[type="number"] {
+.participant input[type="number"] {
     width: 40px;
     padding: 0.5em;
 }
 
-input[type="range"] {
+.participant input[type="range"] {
     width: 70%;
     margin: 0px 5px 0px 0px;
     vertical-align: middle;
@@ -35,7 +30,7 @@ input[type="range"] {
 }
 
 @media screen and (max-width:  950px) {
-    select {
+    .participant select {
         width: min-content;
         height: 33px;
     }
@@ -43,10 +38,10 @@ input[type="range"] {
 
 /* col-4が230px以下のときのデザイン */
 @container (max-width: 230px) {
-    input[type="number"] {
+    .participant input[type="number"] {
         display: none;
     }
-    input[type="range"] {
+    .participant input[type="range"] {
         width: 90%;
     }
     .sp {

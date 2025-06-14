@@ -28,7 +28,7 @@ const Participant = ({ deleteParticipant, participant, changeName, changeCount, 
 
     return (
         <>
-            <tr>
+            <tr className='participant'>
                 <td><button onClick={deleteParticipant}>-</button></td>
                 <td><input type="text" placeholder="役職" value={participant.name} onChange={(e) => {changeName(e.target.value); setCheckInput(true);} } onBlur={(e) => {checkName(e.target.value)}}/></td>
                 <td>
