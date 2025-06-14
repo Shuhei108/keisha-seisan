@@ -98,7 +98,12 @@ const Rule = ({ rule, deleteRule, changeRule, updateForms }) => {
                             }}
                             className="rule-textarea"
                             rows={1}
-                            onKeyDown={handleKeyDown}
+                            onKeyDown={e => {
+                                if (e.key === "Enter") {
+                                    e.preventDefault();
+                                }
+                                handleKeyDown(e);
+                            }}
                         />
                         {showSuggestions && filteredSuggestions.length > 0 && (
                             <div className="suggestion-list-container">
