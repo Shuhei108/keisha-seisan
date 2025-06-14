@@ -2,6 +2,7 @@ import { createContext, useContext, useState } from 'react'
 import TopPage from '@/pages/TopPage/TopPage'
 import Result from '@/pages/ResultPage/ResultPage'
 import LodadingPage from '@/pages/LoadingPage/LoadingPage'
+import ChatPage from '@/pages/ChatPage/ChatPage'
 import './Content.css'
 
 const inputInfoContext = createContext()
@@ -23,7 +24,7 @@ const Content = () => {
         {id: "second", value: "会計金額と計算結果の合計金額の差が500円未満になるまで計算する"}
     ])
     const [amount, setAmount] = useState("")
-    const [status, setStatus] = useState("top")
+    const [status, setStatus] = useState("chat")
     const [forms, setForms] = useState([
         {id: "first", flag: true},
         {id: "second", flag: true},
@@ -107,6 +108,10 @@ const Content = () => {
             return <LodadingPage />
         } else if (status === "result") {
             return <Result />
+        } else if (status === "chat") {
+            return <ChatPage />
+        } else {
+            return <TopPage />
         }
     }
     
