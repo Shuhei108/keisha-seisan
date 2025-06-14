@@ -1,9 +1,8 @@
 .ad {
     width: 25%;
-    min-width: 380px;
 }
 
-@media screen and (max-width: 1200px) {
+@media screen and (max-width: 1000px) {
     .ad {
       width: 100%;
       min-width: fit-content;

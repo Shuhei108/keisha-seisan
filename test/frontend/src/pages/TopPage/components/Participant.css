@@ -21,7 +21,7 @@ input[type="range"] {
     margin: auto 5px;
 }
 
-@media screen and (max-width:  1200px) {
+@media screen and (max-width:  1000px) {
     select {
         width: min-content;
         height: 33px;

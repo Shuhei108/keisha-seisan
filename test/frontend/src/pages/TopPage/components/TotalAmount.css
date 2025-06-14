@@ -3,7 +3,7 @@
     text-align: right;
 }
 
-@media screen and (max-width: 1200px) {
+@media screen and (max-width: 1000px) {
     .total-amount input[type="text"] {
         width: 85%;
     }

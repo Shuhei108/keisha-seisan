@@ -27,7 +27,7 @@
     padding: 0.5em;
 }
 
-@media screen and (max-width:  1200px) {
+@media screen and (max-width:  1000px) {
     .result table {
         width: 90%;
     }
