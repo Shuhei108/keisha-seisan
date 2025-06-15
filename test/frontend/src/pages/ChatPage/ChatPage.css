@@ -41,6 +41,7 @@
     line-height: 1.6;
     word-break: break-word;
     box-shadow: 0 2px 8px rgba(60,60,60,0.08);
+    white-space: pre-line;
 }
 
 .chat-message.user .chat-bubble {
@@ -119,6 +120,30 @@
     cursor: not-allowed;
 }
 
+.chat-back-btn {
+    margin: 18px 0 0 18px;
+    background: none;
+    color: #333333;
+    border: none;
+    border-radius: 100px;
+    padding: 0;
+    font-size: 1.2em;
+    font-weight: 700;
+    cursor: pointer;
+    transition: color 0.15s;
+    outline: none;
+    display: inline-block;
+    text-decoration: none; /* アンダーバーを消す */
+    width: fit-content;
+}
+
+.chat-back-btn:hover,
+.chat-back-btn:focus {
+    color: #1ea896;
+    background: none;
+    text-decoration: none; /* アンダーバーを消す */
+}
+
 @media screen and (max-width: 950px) {
     .chat-page-area {
         width: 100%;
@@ -155,5 +180,11 @@
         background: #fafafa;
         border-radius: 0px 0px 8px 8px;
         z-index: 1;
-}
+    }
+    .chat-back-btn {
+        margin: 10px 0 0 15px;
+        font-size: 1em;
+        padding: 0;
+        text-decoration: none;
+    }
 }

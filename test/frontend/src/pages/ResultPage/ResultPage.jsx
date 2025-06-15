@@ -4,14 +4,7 @@ import './ResultPage.css'
 
 const Result = () => {
     const { participants, setStatus, calculate, calcError, setCalcError, surplus } = useInputInfo()
-    var totalAmount = 0;
-    
-    participants.map((participant) => {
-        totalAmount += parseInt(participant.payment,10) * participant.count
-    })
-    if (surplus != 0) {
-        totalAmount += surplus
-    }
+    var totalAmount = participants.reduce((total, p) => total + (p.payment * p.count), 0) + surplus;
 
     return (
         <div className='result'>

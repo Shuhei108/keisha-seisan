@@ -1,3 +1,4 @@
+import { useInputInfo } from '@/components/PageBody/components/Content/Content'
 import { useState, useRef, useEffect } from 'react'
 import './ChatPage.css'
 
@@ -8,8 +9,18 @@ const SendIcon = () => (
 )
 
 const ChatPage = () => {
+    const { participants, setStatus, setCalcError, surplus,  } = useInputInfo()
+
     const [messages, setMessages] = useState([
-        { role: 'ai', text: 'ご質問や調整内容を入力してください。' }
+        { 
+            role: 'ai',
+            text: 'ご質問や調整内容を入力してください。' 
+                + '\n\n---計算結果---\n'
+                + participants.map(p => `${p.name}: ${p.payment}円`).join('\n')
+                + (surplus !== 0 ? `\n余り: ${surplus}円` : '')
+                + '\n合計金額: '
+                + (participants.reduce((total, p) => total + (p.payment * p.count), 0) + surplus)  + '円'
+        }
     ])
     const [input, setInput] = useState('')
     const messagesEndRef = useRef(null)
@@ -48,15 +59,22 @@ const ChatPage = () => {
         // AI応答は未実装
     }
 
+    // ...existing code...
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+
     const handleKeyDown = (e) => {
+        if (isMobile) return // モバイルは何もしない（改行のみ）
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault()
             handleSend()
         }
     }
 
-    return (
+    return (    
         <div className="chat-page-area">
+            <a className="chat-back-btn" href="#" onClick={(e) => {setStatus("result"); setCalcError(false); e.preventDefault();}}>
+                &lt;&nbsp;戻る
+            </a>
             <div className="chat-messages">
                 {messages.map((msg, idx) => (
                     <div
