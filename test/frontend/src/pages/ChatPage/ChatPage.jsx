@@ -8,21 +8,27 @@ const SendIcon = () => (
     </svg>
 )
 
-const ChatPage = () => {
-    const { participants, setStatus, setCalcError, surplus,  } = useInputInfo()
+function getInitialMessage(participants, surplus) {
+    const total = participants.reduce((total, p) => total + (p.payment * p.count), 0) + surplus
+    return [
+        'ご質問や調整内容を入力してください。',
+        '',
+        '計算結果:',
+        '役職名 | 人数 | 一人当たりの支払金額',
+        '------------------------------',
+        ...participants.map(p => `${p.name} | ${p.count} | ${p.payment}円`),
+        surplus !== 0 ? `余り: ${surplus}円` : '',
+        `合計金額: ${total}円`
+    ].filter(Boolean).join('\n')
+}
 
+const ChatPage = () => {
+    const { participants, setStatus, setCalcError, surplus } = useInputInfo()
     const [messages, setMessages] = useState([
-        { 
-            role: 'ai',
-            text: 'ご質問や調整内容を入力してください。' 
-                + '\n\n---計算結果---\n'
-                + participants.map(p => `${p.name}: ${p.payment}円`).join('\n')
-                + (surplus !== 0 ? `\n余り: ${surplus}円` : '')
-                + '\n合計金額: '
-                + (participants.reduce((total, p) => total + (p.payment * p.count), 0) + surplus)  + '円'
-        }
+        { role: 'ai', text: getInitialMessage(participants, surplus) }
     ])
     const [input, setInput] = useState('')
+    const [loading, setLoading] = useState(false)
     const messagesEndRef = useRef(null)
     const textareaRef = useRef(null)
 
@@ -34,6 +40,13 @@ const ChatPage = () => {
     }, [messages])
 
     // textareaの高さ自動調整
+    useEffect(() => {
+        if (textareaRef.current) {
+            textareaRef.current.style.height = 'auto'
+            textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`
+        }
+    }, [input])
+
     const handleInputChange = (e) => {
         setInput(e.target.value)
         if (textareaRef.current) {
@@ -42,24 +55,29 @@ const ChatPage = () => {
         }
     }
 
-    useEffect(() => {
-        if (textareaRef.current) {
-            textareaRef.current.style.height = 'auto'
-            textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`
-        }
-    }, [input])
-
-    const handleSend = () => {
-        if (!input.trim()) return
-        setMessages([...messages, { role: 'user', text: input }])
+    const handleSend = async () => {
+        if (!input.trim() || loading) return
+        const userMsg = input
+        setMessages(prev => [...prev, { role: 'user', text: userMsg }])
         setInput('')
+        setLoading(true)
         if (textareaRef.current) {
             textareaRef.current.style.height = 'auto'
         }
-        // AI応答は未実装
+        try {
+            const res = await fetch('/api/v1/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: userMsg })
+            })
+            const data = await res.json()
+            setMessages(prev => [...prev, { role: 'ai', text: data.message }])
+        } catch (e) {
+            setMessages(prev => [...prev, { role: 'ai', text: 'AI応答の取得に失敗しました。' }])
+        }
+        setLoading(false)
     }
 
-    // ...existing code...
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
 
     const handleKeyDown = (e) => {
@@ -70,9 +88,15 @@ const ChatPage = () => {
         }
     }
 
-    return (    
+    const handleBack = (e) => {
+        setStatus("result")
+        setCalcError(false)
+        e.preventDefault()
+    }
+
+    return (
         <div className="chat-page-area">
-            <a className="chat-back-btn" href="#" onClick={(e) => {setStatus("result"); setCalcError(false); e.preventDefault();}}>
+            <a className="chat-back-btn" href="#" onClick={handleBack}>
                 &lt;&nbsp;戻る
             </a>
             <div className="chat-messages">
@@ -84,6 +108,11 @@ const ChatPage = () => {
                         <div className="chat-bubble">{msg.text}</div>
                     </div>
                 ))}
+                {loading && (
+                    <div className="chat-message ai">
+                        <div className="chat-bubble">AIが応答中...</div>
+                    </div>
+                )}
                 <div ref={messagesEndRef} />
             </div>
             <div className="chat-input-row">
@@ -96,11 +125,12 @@ const ChatPage = () => {
                     onKeyDown={handleKeyDown}
                     placeholder="メッセージを入力..."
                     rows={1}
+                    disabled={loading}
                 />
                 <button
                     className="chat-send-btn"
                     onClick={handleSend}
-                    disabled={!input.trim()}
+                    disabled={!input.trim() || loading}
                     aria-label="送信"
                     type="button"
                 >

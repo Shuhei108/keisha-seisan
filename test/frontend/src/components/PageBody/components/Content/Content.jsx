@@ -24,7 +24,7 @@ const Content = () => {
         {id: "second", value: "会計金額と計算結果の合計金額の差が500円未満になるまで計算する"}
     ])
     const [amount, setAmount] = useState("")
-    const [status, setStatus] = useState("chat")
+    const [status, setStatus] = useState("top")
     const [forms, setForms] = useState([
         {id: "first", flag: true},
         {id: "second", flag: true},

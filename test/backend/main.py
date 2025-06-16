@@ -1,206 +1,144 @@
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel, Field
-from typing import List, Dict
-import google.generativeai as genai
+from fastapi import FastAPI, HTTPException, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
-import constForPrompt
-import json
-import math  
+from constForPrompt import ConstForPrompt
 import os
 from dotenv import load_dotenv
-from datetime import datetime, timezone
+import json
+from history_utils import get_redis_client, get_session_id
+
+from schemas import RequestFormat, chatRequestFormat
+from validators import validate_request
+from logic import (
+    calc_simple_settlement,
+    generate_response_with_rules,
+    generate_chat_response
+)
+from logger import write_log
+
+CONST = ConstForPrompt
 
 # 環境変数をロード
 load_dotenv()
 
-# 定数クラス
-CONST = constForPrompt.ConstForPrompt
-
-# リクエストフォーマット
-class RequestFormat(BaseModel):
-    amount: int
-    participants: Dict[str, Dict[str, int]] = Field(..., min_length=1)
-    rules: List[str] = None
-    model: str = None
-
-# FastAPIのインスタンスを作成
 app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=os.getenv("ALLOW_ORIGINS", "").split(","),  # 環境変数から取得
+    allow_origins=os.getenv("ALLOW_ORIGINS", "").split(","),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# APIキー設定
-genai.configure(api_key=os.getenv("API_KEY"))  # 環境変数から取得
-
-response_schema = {
-    "type": "object",
-    "properties": {
-        "settlement_plan": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "participant": {"type": "string"},
-                    "amount": {"type": "integer"},
-                    "count": {"type": "integer"}
-                },
-                "required": ["participant", "amount", "count"]
-            }
-        },
-        "surplus": {  
-            "type": "integer",
-            "description": "割り切れなかった場合の余剰金。割り切れる場合は含まれない。"
-        }
-    },
-    "required": ["settlement_plan"]
-}
-
-def write_log(log_type: str, body: dict):
-    """
-    リクエスト・レスポンス情報をlogファイルに追記する
-    """
-    log_dir = "logs"
-    log_path = os.path.join(log_dir, "request_response.log")
-    os.makedirs(log_dir, exist_ok=True)
-    log_entry = {
-        "timestamp": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-        "type": log_type,
-        "body": body
-    }
-    with open(log_path, "a", encoding="utf-8") as f:
-        f.write(json.dumps(log_entry, ensure_ascii=False) + "\n")
+# Redisクライアントを初期化
+redis_client = get_redis_client()
 
 @app.post("/v1/calc")
-async def calculate_settlement(data: RequestFormat):
-    """
-    清算金額を計算するエンドポイント
-    """
+async def calculate_settlement(
+    data: RequestFormat,
+    request: Request,
+    response: Response
+):
+    # セッションIDをcookieから取得、なければ新規発行
+    session_id = get_session_id(request, response)
+    
+    # セッションIDをキーにしてRedisの情報をクリア
+    history_key = f"chat_history:{session_id}"
+    redis_client.delete(history_key)
+
     # リクエストログ出力
-    write_log("request", data.dict())
+    write_log("request", data.model_dump())
 
-    # amountのチェック
-    if data.amount <= 0:
-        raise HTTPException(status_code=400, detail="amountは正の整数である必要があります。")
-
-    # participants数のチェック
-    if len(data.participants) > 20:
-        raise HTTPException(status_code=400, detail="participantsの数は最大20人までです。")
-
-    # participants内容のチェック
-    for name, info in data.participants.items():
-        if not name.strip():
-            raise HTTPException(status_code=400, detail="参加者名（participantsのキー）が空文字または空白のみです。")
-        if not isinstance(info, dict):
-            raise HTTPException(status_code=400, detail=f"{name}の情報が不正です。")
-        if CONST.COUNT not in info or CONST.WEIGHT not in info:
-            raise HTTPException(status_code=400, detail=f"{name}のデータに必要なキー（count, weight）が不足しています。")
-        if not isinstance(info[CONST.COUNT], int) or info[CONST.COUNT] <= 0:
-            raise HTTPException(status_code=400, detail=f"{name}のcountは正の整数である必要があります。")
-        if not isinstance(info[CONST.WEIGHT], int) or info[CONST.WEIGHT] <= 0:
-            raise HTTPException(status_code=400, detail=f"{name}のweightは正の整数である必要があります。")
-
-    # rulesのチェック（任意だが、存在する場合は検査）
-    if data.rules:
-        if len(data.rules) > 10:
-            raise HTTPException(status_code=400, detail="rulesの数は最大10個までです。")
-        for i, rule in enumerate(data.rules):
-            if not isinstance(rule, str) or not rule.strip():
-                raise HTTPException(status_code=400, detail=f"rules[{i}] が空文字または空白のみです。")
+    # 入力バリデーション
+    try:
+        validate_request(data)
+    except HTTPException as e:
+        raise e
 
     # 正常処理
     if not data.rules:
         result = calc_simple_settlement(data.amount, data.participants)
     else:
-        result = generate_response_with_rules(data.amount, data.participants, data.rules, data.model)
+        # generate_response_with_rulesの引数を修正
+        result = generate_response_with_rules(
+            data.amount, data.participants, data.rules, data.model, session_id, redis_client
+        )
 
     # レスポンスログ出力
     write_log("response", result)
 
+    # 精算情報を抽出してRedisに追加（セッションIDで管理、1ユーザー1件のみ保持）
+    settlement_info = {
+        "request": data.model_dump(),
+        "response": result
+    }
+    redis_client.set(f"settlements:{session_id}", json.dumps(settlement_info), ex=3600)
+
     return result
 
-def calc_simple_settlement(amount: int, participants: Dict[str, Dict[str, int]]):
-    """
-    単純な割り勘計算を行う。
-    """
-    total_weight = sum(p[CONST.COUNT] * p[CONST.WEIGHT] for p in participants.values())
-    settlement_plan = [
-        {"participant": name, "amount": math.ceil(amount * p[CONST.WEIGHT] / total_weight)}
-        for name, p in participants.items()
-    ]
-    return {"settlement_plan": settlement_plan, "total_amount": sum(item["amount"] for item in settlement_plan)}
+@app.post("/v1/chat")
+async def ai_chat(
+    data: chatRequestFormat,
+    request: Request,
+    response: Response
+):
+    # セッションIDをcookieから取得（get_session_idで統一）
+    session_id = get_session_id(request, response)
 
-def generate_response_with_rules(amount: int, participants: Dict[str, Dict[str, int]], rules: List[str], model_name: str = None):
-    """
-    ルールを考慮した清算計算をGemini APIを用いて行う。
-    """
-    try:
-        model = genai.GenerativeModel(model_name=model_name, tools='code_execution')
-        modelForRes = genai.GenerativeModel(model_name=model_name)
+    # Redisから直近の計算結果を取得
+    settlement_json = redis_client.get(f"settlements:{session_id}")
+    if not settlement_json:
+        raise HTTPException(status_code=404, detail="計算結果が見つかりません。")
 
-        
-        messages = [
-            {'role': 'user', 'parts': CONST.SYSTEM_PROMPT},
-            {'role': 'model', 'parts': '承知しました。'}
-        ]
-        
-        prompt = CONST.PROMPT.format(
-            CONST.AMOUNT_FORMAT.format(amount),
-            format_participants(participants),
-            format_temp_calculation(amount, participants),
-            CONST.DEFAULT_RULE_FORMAT.format(CONST.GREATER_THAN.join(participants)),
-            format_additional_rules(rules)
-        )   
-        messages.append({'role': 'user', 'parts': [prompt]})
-        
-        res = model.generate_content(messages, generation_config=genai.GenerationConfig(
-            temperature=0.0, top_k=1, top_p=0.3
-        ))
-        
-        messages.append({'role': 'model', 'parts': res.text})
-        messages.append({'role': 'user', 'parts': CONST.PRMPT_FOR_ANS})
-        
-        res = modelForRes.generate_content(messages, generation_config=genai.GenerationConfig(
-            response_mime_type="application/json", response_schema=response_schema,
-            temperature=0.0, top_k=1, top_p=0.3
-        ))
-        
-        obj = json.loads(res.text)
-        obj["total_amount"] = sum(
-            p["amount"] * participants[p["participant"]][CONST.COUNT] for p in obj["settlement_plan"]
+    settlement_info = json.loads(settlement_json)
+    # --- 会話履歴を取得 ---
+    history_key = f"chat_history:{session_id}"
+    history_json = redis_client.get(history_key)
+    history = json.loads(history_json) if history_json else []
+    
+    # settlement_infoから必要な情報を抽出
+    req = settlement_info.get("request", {})
+    res = settlement_info.get("response", {})
+    participants = req.get("participants", {})
+    settlement_plan = res.get("settlement_plan", [])
+    surplus = res.get("surplus", None)
+    total_amount = res.get("total_amount", None)
+
+    # 初回プロンプト追加
+    if len(history) == 0:
+        first_message = CONST.PROMPT_FOR_NO_RULES.format(
+            CONST.AMOUNT_FORMAT.format(req.get("amount", 0)),
+            "".join(CONST.PARTICIPANT_FORMAT.format("", name, p.get(CONST.COUNT, 0)) for name, p in participants.items())
         )
-        if "surplus" in obj:
-            obj["total_amount"] += obj["surplus"]
+        history.append({"role": "user", "content": first_message})
 
-        return obj
-    except Exception as e:
-        print(f"APIエラー: {e}") 
-        return {
-            "error": "APIエラー",
-        }
+    # 1回目のassistant応答追加
+    if len([h for h in history if h["role"] == "user"]) < 2:
+        lines = []
+        lines.append("計算結果:")
+        lines.append("役職名 | 人数 | 一人当たりの支払金額")
+        lines.append("------------------------------")
+        for plan in settlement_plan:
+            name = plan.get("participant", "")
+            count = participants.get(name, {}).get("人数", "")
+            amount = plan.get("amount", "")
+            lines.append(f"{name} | {count} | {amount}円")
+        if surplus is not None:
+            lines.append(f"\n余り: {surplus}円")
+        if total_amount is not None:
+            lines.append(f"合計金額: {total_amount}円")
+        assistant_prompt = "\n".join(lines)
+        history.append({"role": "assistant", "content": assistant_prompt})
 
-def format_participants(participants: Dict[str, Dict[str, int]]) -> str:
-    """
-    参加者リストをプロンプト用にフォーマットする。
-    """
-    return "".join(CONST.PARTICIPANT_FORMAT.format("", name, p[CONST.COUNT]) for name, p in participants.items())
+    # ユーザーの新しいメッセージを履歴に追加
+    history.append({"role": "user", "content": data.message})
 
-def format_temp_calculation(amount: int, participants: Dict[str, Dict[str, int]]) -> str:
-    """
-    仮計算のフォーマットを作成する。
-    """
-    total_weight = sum(p[CONST.COUNT] * p[CONST.WEIGHT] for p in participants.values())
-    return "".join(
-        CONST.CULC_FORMAT.format("", name, int(amount * p[CONST.WEIGHT] / total_weight))
-        for name, p in participants.items()
-    )
+    # プロンプト生成とAI呼び出し（履歴を渡す）
+    ai_result = generate_chat_response(settlement_info, data.message, history=history)
 
-def format_additional_rules(rules: List[str]) -> str:
-    """
-    追加ルールをプロンプト用にフォーマットする。
-    """
-    return "".join(CONST.ADDING_RULE_FORMAT.format("", i + 2, rule) for i, rule in enumerate(rules)) if rules else ""
+    # AI応答も履歴に追加して保存
+    history.append({"role": "assistant", "content": ai_result})
+    redis_client.set(history_key, json.dumps(history), ex=3600)
+    # ---
+
+    return {"message": ai_result}

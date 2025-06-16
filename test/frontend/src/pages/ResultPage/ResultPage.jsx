@@ -4,11 +4,29 @@ import './ResultPage.css'
 
 const Result = () => {
     const { participants, setStatus, calculate, calcError, setCalcError, surplus } = useInputInfo()
-    var totalAmount = participants.reduce((total, p) => total + (p.payment * p.count), 0) + surplus;
+    const totalAmount = participants.reduce((total, p) => total + (p.payment * p.count), 0) + surplus
+
+    const handleBack = () => {
+        setStatus("top")
+        setCalcError(false)
+    }
+
+    const handleRecalc = () => {
+        calculate()
+    }
+
+    const handleChat = (e) => {
+        e.preventDefault()
+        setStatus("chat")
+    }
 
     return (
         <div className='result'>
-            {calcError && <h2 className='error-message' style={{ textAlign: 'center' , margin: '8px 30px' }}>エラーが発生しました。<br/>しばらく時間を空けてから実行してください。</h2>}
+            {calcError && (
+                <h2 className='error-message' style={{ textAlign: 'center', margin: '8px 30px' }}>
+                    エラーが発生しました。<br />しばらく時間を空けてから実行してください。
+                </h2>
+            )}
             <table>
                 <thead>
                     <tr>
@@ -17,7 +35,12 @@ const Result = () => {
                 </thead>
                 <tbody>
                     <EarchPayment participants={participants} />
-                    {surplus !== 0 && <tr><td>余り</td><td>{surplus}円</td></tr>}
+                    {surplus !== 0 && (
+                        <tr>
+                            <td>余り</td>
+                            <td>{surplus}円</td>
+                        </tr>
+                    )}
                 </tbody>
                 <tfoot>
                     <tr>
@@ -26,8 +49,9 @@ const Result = () => {
                     </tr>
                 </tfoot>
             </table>
-            <button onClick={()=>{setStatus("top"); setCalcError(false)}}>戻る</button>
-            <button onClick={calculate}>再計算</button>
+            <button onClick={handleBack}>戻る</button>
+            <button onClick={handleRecalc}>再計算</button>
+            <button className='chat-botton' onClick={handleChat}>チャットで微調整</button>
         </div>
     )
 }

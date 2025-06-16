@@ -27,6 +27,10 @@
     padding: 0.5em;
 }
 
+.chat-botton {
+    width: 200px;
+}
+
 @media screen and (max-width:  950px) {
     .result table {
         width: 90%;
@@ -38,5 +42,11 @@
 
     .result tfoot {
         font-size: 1em;
+    }
+}
+
+@media screen and (max-width:  450px) {
+    .result button {
+        width: 200px;
     }
 }
