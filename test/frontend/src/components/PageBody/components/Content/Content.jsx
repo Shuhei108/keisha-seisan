@@ -51,9 +51,15 @@ const Content = () => {
         })
         setForms(newForms)
     }
-    const calculate = async () => {
-        setStatus("loading")
+    
+    const handlePageChange = (newStatus) => {
+        window.scrollTo(0, 0)
+        setStatus(newStatus)
         setCalcError(false)
+    }
+
+    const calculate = async () => {
+        handlePageChange("loading")
 
         const url = '/api/v1/calc'
         const reqData = {
@@ -98,8 +104,9 @@ const Content = () => {
         } catch (error) {
             setCalcError(true)
         }
-        setStatus("result")
+        handlePageChange("result")
     }
+
 
     const viewControl = () => {
         if (status === "top") {
@@ -116,7 +123,7 @@ const Content = () => {
     }
     
     return (
-        <inputInfoContext.Provider value={{ status, setStatus, participants, setParticipants, rules,
+        <inputInfoContext.Provider value={{ status, handlePageChange, participants, setParticipants, rules,
             setRules, amount, setAmount, forms, setForms, addForms, deleteForms, updateForms, calculate,
             calcError, setCalcError, model, setModel, models, surplus }}>
             <div className='content area'>

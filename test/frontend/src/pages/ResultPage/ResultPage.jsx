@@ -3,21 +3,19 @@ import EarchPayment from './components/EachPayment'
 import './ResultPage.css'
 
 const Result = () => {
-    const { participants, setStatus, calculate, calcError, setCalcError, surplus } = useInputInfo()
+    const { participants, handlePageChange, calculate, calcError, surplus } = useInputInfo()
     const totalAmount = participants.reduce((total, p) => total + (p.payment * p.count), 0) + surplus
 
     const handleBack = () => {
-        setStatus("top")
-        setCalcError(false)
+        handlePageChange("top")
     }
 
     const handleRecalc = () => {
         calculate()
     }
 
-    const handleChat = (e) => {
-        e.preventDefault()
-        setStatus("chat")
+    const handleChat = () => {
+        handlePageChange("chat")
     }
 
     return (

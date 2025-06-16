@@ -23,7 +23,7 @@ function getInitialMessage(participants, surplus) {
 }
 
 const ChatPage = () => {
-    const { participants, setStatus, setCalcError, surplus } = useInputInfo()
+    const { participants, handlePageChange, setCalcError, surplus } = useInputInfo()
     const [messages, setMessages] = useState([
         { role: 'ai', text: getInitialMessage(participants, surplus) }
     ])
@@ -89,9 +89,7 @@ const ChatPage = () => {
     }
 
     const handleBack = (e) => {
-        setStatus("result")
-        setCalcError(false)
-        e.preventDefault()
+        handlePageChange("result")
     }
 
     return (
