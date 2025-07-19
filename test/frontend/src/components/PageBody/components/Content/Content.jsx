@@ -55,11 +55,11 @@ const Content = () => {
     const handlePageChange = (newStatus) => {
         window.scrollTo(0, 0)
         setStatus(newStatus)
-        setCalcError(false)
     }
 
     const calculate = async () => {
         handlePageChange("loading")
+        setCalcError(false)
 
         const url = '/api/v1/calc'
         const reqData = {

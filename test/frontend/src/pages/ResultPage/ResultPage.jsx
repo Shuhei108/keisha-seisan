@@ -49,7 +49,11 @@ const Result = () => {
             </table>
             <button onClick={handleBack}>戻る</button>
             <button onClick={handleRecalc}>再計算</button>
-            <button className='chat-botton' onClick={handleChat}>チャットで微調整</button>
+            { 
+                calcError ?
+                <button className='chat-botton dummy-btn' disabled={true}>チャットで微調整</button> :
+                <button className='chat-botton' onClick={handleChat}>チャットで微調整</button>
+            }
         </div>
     )
 }

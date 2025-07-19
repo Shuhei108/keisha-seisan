@@ -14,7 +14,7 @@ const LoadingPage = () => {
                     aria-label="Loading Spinner"
                 />
             </div>
-            <p className="loading-desc">計算には時間がかかることがあります。</p>
+            <p className="loading-desc">計算には時間がかかります。</p>
         </div>
     )
 }

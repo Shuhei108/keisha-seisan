@@ -19,7 +19,7 @@ const Execute = () => {
             {
                 forms.every((form) => (form.flag === true)) && participants.length > 0 ?
                 <button className="exe-btn" onClick={calculate} disabled={false}>計算する</button>:
-                <button className="dummy-btn" disabled={true}>計算する</button>
+                <button className="exe-btn dummy-btn" disabled={true}>計算する</button>
             }
             <select
                 className="model-select"
