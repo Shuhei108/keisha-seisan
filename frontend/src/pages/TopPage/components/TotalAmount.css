@@ -1,0 +1,10 @@
+.total-amount input[type="text"] {
+    width: 90%;
+    text-align: right;
+}
+
+@media screen and (max-width: 950px) {
+    .total-amount input[type="text"] {
+        width: 85%;
+    }
+}

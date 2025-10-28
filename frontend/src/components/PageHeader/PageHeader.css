@@ -1,0 +1,35 @@
+header {
+    display: flex;
+    justify-self: center;
+    align-items: center;
+    width: 90%;
+}
+
+header .title {
+    font-size: 3rem;
+    margin: 5px auto 5px 0px;
+}
+
+@media screen and (max-width: 950px) {
+    header {
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+    }
+    header .title {
+        font-size: 2em;
+        margin-right: 0px;
+    }
+    .header-buttons {
+        display: flex;
+        flex-direction: row;
+        gap: 8px;
+        justify-content: center;
+        width: 100%;
+    }
+    header button {
+        margin: 4px 0;
+    }
+}
+

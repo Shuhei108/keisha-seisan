@@ -1,0 +1,63 @@
+.top-page table button {
+    width: 35px;
+    border-radius: 10px;
+    line-height: 35px;
+    float: right;
+}
+
+.top-page table {
+    width: 90%;
+    margin: 0 auto;
+}
+
+.top-page .col-1 {
+    width: 10%;
+    padding-left: auto;
+}
+.top-page .col-2 {
+    width: 30%;
+    text-align: start;
+}
+.top-page .col-3 {
+    width: 10%;
+    text-align: start;
+}
+.top-page .col-4 {
+    width: 50%;
+    text-align: start;
+}
+
+@media screen and (max-width:  950px) {
+    h2 {
+        margin-top: 8px;
+        margin-bottom: 8px;
+    }
+    .top-page table {
+        width: 100%;
+    }
+    .top-page .col-1 {
+        width: 10%;
+        min-width: 46px;
+    }
+    .top-page .col-2 {
+        width: 35%;
+    }
+    .top-page .col-3 {
+        width: 52px;
+    }
+    .top-page .col-4 {
+        width: auto;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+        width: 20px;
+        height: 20px;
+    }
+    input[type="range"]::-moz-range-thumb {
+        width: 20px;
+        height: 20px;
+    }
+    input[type="range"]::-ms-thumb {
+        width: 20px;
+        height: 20px;
+    }
+}

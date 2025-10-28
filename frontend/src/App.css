@@ -1,0 +1,39 @@
+button {
+  background: #333333;
+  color: #ffffff;
+  border-radius: 100px;
+  width: 130px;
+  line-height: 45px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 1rem;
+  border: none;
+  letter-spacing: 0.05em;
+  margin: 10px;
+}
+
+button:hover {
+  background: #4234FA;
+  cursor:pointer
+}
+
+.error-message {
+  color: red;
+}
+
+input[type="text"] {
+  height: 38px;
+  padding: 0.5em;
+  font-size: 1em;
+  border-radius: 5px;
+  box-sizing: border-box;
+}
+
+@media screen and (max-width:  950px) {
+  button {
+    margin: 5px;
+  }
+  .error-message {
+    font-size: 0.7em;
+  }
+}

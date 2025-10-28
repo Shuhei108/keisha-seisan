@@ -1,0 +1,12 @@
+.participants-header {
+    display: flex;
+    align-items: center;
+}
+
+.participants-header h2 {
+    margin-right: 8px;
+}
+
+.participants-help-icon {
+    cursor: pointer;
+}

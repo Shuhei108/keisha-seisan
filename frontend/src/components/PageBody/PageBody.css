@@ -1,0 +1,22 @@
+.page-body {
+    display:flex;
+    justify-content: center;
+}
+  
+.area {
+    background: white;
+    border-radius: 8px;
+    margin: 10px;
+    padding: 20px;
+}
+
+@media screen and (max-width:  950px) {
+    .page-body {
+      display: block;
+    }
+  
+    .area {
+      margin: 5px auto;
+      padding: 10px 0px;
+    }
+}

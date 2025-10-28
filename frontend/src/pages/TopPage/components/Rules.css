@@ -1,0 +1,12 @@
+.rules-header {
+    display: flex;
+    align-items: center;
+}
+
+.rules-header h2 {
+    margin-right: 8px;
+}
+
+.rules-help-icon {
+    cursor: pointer;
+}

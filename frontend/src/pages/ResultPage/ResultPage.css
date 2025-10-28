@@ -1,0 +1,52 @@
+.result {
+    text-align: center;
+}
+
+.result table {
+    width: 40%;
+    margin: 0 auto;
+    table-layout: fixed;
+    text-align: center;
+    border-collapse: collapse;
+}
+
+.result tbody {
+    font-size: 1.2em;
+}
+
+.result tbody td {
+    padding: 0.2em;
+}
+
+.result tfoot {
+    border-top: 2px solid black;
+    font-size: 1.2em;
+}
+
+.result tfoot td {
+    padding: 0.5em;
+}
+
+.chat-botton {
+    width: 200px;
+}
+
+@media screen and (max-width:  950px) {
+    .result table {
+        width: 90%;
+    }
+
+    .result tbody {
+        font-size: 1em;
+    }
+
+    .result tfoot {
+        font-size: 1em;
+    }
+}
+
+@media screen and (max-width:  450px) {
+    .result button {
+        width: 200px;
+    }
+}

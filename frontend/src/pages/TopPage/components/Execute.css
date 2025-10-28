@@ -1,0 +1,39 @@
+.exe-btn {
+    display: block;
+    margin: 30px 8px 30px auto;
+    width: 250px;
+}
+
+.dummy-btn {
+    opacity:34%;
+    pointer-events: none;
+}
+
+.execute-row {
+    display: flex;
+    align-items: center;
+}
+
+.model-select {
+    padding: 6px 12px;
+    font-size: 1rem;
+    border-radius: 4px;
+    border: 1px solid #36d7b7;
+    color: #36d7b7;
+    background: #fff;
+    outline: none;
+    transition: border-color 0.2s;
+    margin: 30px auto 30px 8px;
+}
+.model-select:focus {
+    border-color: #1ea896;
+}
+
+@media screen and (max-width:  950px) {
+    .exe-btn {
+        width: 200px;
+    }
+    .dummy-btn {
+        width: 200px;
+    }
+}

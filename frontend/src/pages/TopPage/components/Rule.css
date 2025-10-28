@@ -1,0 +1,83 @@
+.rule-textarea {
+    width: 90%;                /* テキストエリアの横幅（親要素の90%） */
+    min-height: 39px;          /* テキストエリアの最小高さ */
+    height: auto;              /* 高さは自動調整 */
+    padding: 0.5em 0.5em;      /* 上下左右の内側余白を均等に */
+    font-size: 1em;            /* 文字サイズ */
+    font-family: inherit;
+    border-radius: 5px;        /* 角の丸み */
+    resize: none;              /* ユーザーによるリサイズ禁止 */
+    overflow: hidden;          /* スクロールバー非表示 */
+    box-sizing: border-box;    /* paddingとborderをwidth/heightに含める */
+    line-height: 1.5;          /* 行の高さ */
+    vertical-align: middle;    /* 垂直方向の配置 */
+    white-space: pre-wrap;     /* テキストの折り返し（改行文字も反映） */
+    word-break: break-all;     /* 単語の途中でも折り返し */
+    overflow-wrap: break-word; /* 単語の途中でも折り返し */
+    border-width: 2px;
+    border-style: inset;
+    border-color: light-dark(rgb(118, 118, 118), rgb(133, 133, 133));
+    border-image: initial;
+}
+
+.suggestion-list-container {
+    position: absolute;
+    left: 0;
+    top: 110%;
+    width: 90%;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 16px rgba(60, 60, 60, 0.12), 0 1.5px 4px rgba(60,60,60,0.08);
+    border: 1px solid #e0e0e0;
+    z-index: 20;
+    margin: 0;
+    padding: 0;
+    transition: box-shadow 0.2s;
+}
+
+.suggestion-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.suggestion-item {
+    padding: 12px 18px;
+    font-size: 1em;
+    color: #333;
+    cursor: pointer;
+    border-bottom: 1px solid #e0e0e0;
+    background: #fff;
+    transition: background 0.15s, color 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.suggestion-item:last-child {
+    border-bottom: none;
+}
+
+.suggestion-item:hover,
+.suggestion-item.highlighted {
+    background: #36d7b7;
+    color: #fff;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(54,215,183,0.08);
+}
+
+.rules {
+    position: relative;
+}
+
+@media screen and (max-width: 950px) {
+    .rule-textarea {
+        width: 85%;
+        border-width: 1px;
+        border-style: solid;
+        border-color: light-dark(rgb(118, 118, 118), rgb(133, 133, 133));
+    }
+    .suggestion-list-container {
+        width: 85%;
+    }
+}
