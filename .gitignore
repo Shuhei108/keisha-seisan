@@ -1,9 +1,3 @@
-環境構築用/fastapi_react_cheatsheet.txt
-環境構築用/fastapi_react_deploy_guide.txt
-環境構築用/install_docker_manual.sh
-環境構築用/PAT
-環境構築用/swap領域の作成.txt
-環境構築用/VMインスタンスの作成からデプロイまでの流れ.txt
 環境構築用/
 backend/.env
 test/
